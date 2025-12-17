@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Mrs+Saint+Delafield&display=swap');
 
 .receipt-container .text-2xl { font-size: 1.2rem; line-height: 1.6rem; }
 .receipt-container .text-xl { font-size: 1rem; line-height: 1.4rem; }

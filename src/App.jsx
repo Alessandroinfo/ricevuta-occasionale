@@ -131,8 +131,8 @@ export default function RicevutaGenerator() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         
         // Set font and measure text
-        const fontSize = 60;
-        ctx.font = `${fontSize}px "Dancing Script", cursive`;
+        const fontSize = 90;
+        ctx.font = `${fontSize}px "Mrs Saint Delafield", cursive`;
         ctx.fillStyle = 'black';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
@@ -568,6 +568,7 @@ export default function RicevutaGenerator() {
                     <PenTool size={18} />
                     Disegna
                   </button>
+                  {/* Pen mode hidden for now
                   <button
                     onClick={() => setSignatureMode('pen')}
                     className={`flex-1 py-3 text-sm font-medium flex items-center justify-center gap-2 transition-colors ${
@@ -579,6 +580,7 @@ export default function RicevutaGenerator() {
                     <PenLine size={18} />
                     Penna
                   </button>
+                  */}
                   <button
                     onClick={() => setSignatureMode('type')}
                     className={`flex-1 py-3 text-sm font-medium flex items-center justify-center gap-2 transition-colors ${
@@ -599,10 +601,10 @@ export default function RicevutaGenerator() {
                       <div className="absolute inset-0 w-full h-full">
                         <SignatureCanvas 
                           ref={sigCanvas}
-                          penColor={signatureMode === 'pen' ? 'blue' : 'black'}
+                          penColor="black"
                           velocityFilterWeight={0.7}
-                          minWidth={signatureMode === 'pen' ? 2 : 1.5}
-                          maxWidth={signatureMode === 'pen' ? 4 : 3.5}
+                          minWidth={0.5}
+                          maxWidth={1.5}
                           canvasProps={{
                             className: 'absolute inset-0 w-full h-full'
                           }}
@@ -659,7 +661,7 @@ export default function RicevutaGenerator() {
                           {/* Custom Pen Cursor (Fixed to Viewport) */}
                           <div 
                             ref={penCursorRef}
-                            className="fixed top-0 left-0 pointer-events-none z-50 text-blue-600 drop-shadow-xl"
+                            className="fixed top-0 left-0 pointer-events-none z-50 text-gray-900 drop-shadow-xl"
                             style={{ willChange: 'transform' }}
                           >
                             <PenTool size={48} fill="currentColor" strokeWidth={1.5} />
@@ -684,8 +686,8 @@ export default function RicevutaGenerator() {
                       
                       <div className="w-full max-w-xl h-40 bg-white border border-gray-200 rounded-lg shadow-sm flex items-center justify-center relative overflow-hidden">
                         <p 
-                          className="text-6xl text-black" 
-                          style={{ fontFamily: '"Dancing Script", cursive' }}
+                          className="text-7xl text-black" 
+                          style={{ fontFamily: '"Mrs Saint Delafield", cursive' }}
                         >
                           {typedSignature || 'Tua Firma'}
                         </p>
