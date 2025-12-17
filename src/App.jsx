@@ -27,8 +27,10 @@ export default function RicevutaGenerator() {
 
   const [userRole, setUserRole] = useState('prestatore'); // 'prestatore' | 'committente'
   const [isSignatureModalOpen, setIsSignatureModalOpen] = useState(false);
-  const [signatureMode, setSignatureMode] = useState('draw'); // 'draw' | 'type'
+  const [signatureMode, setSignatureMode] = useState('draw'); // 'draw' | 'type' | 'pen'
   const [typedSignature, setTypedSignature] = useState('');
+  const [penPosition, setPenPosition] = useState({ x: 0, y: 0 });
+  const [isHoveringCanvas, setIsHoveringCanvas] = useState(false);
 
   const receiptRef = useRef(null);
   const sigCanvas = useRef({});
@@ -37,7 +39,7 @@ export default function RicevutaGenerator() {
   // Resize canvas on modal open
   useEffect(() => {
     if (isSignatureModalOpen) {
-      if (signatureMode === 'draw' && sigCanvas.current) {
+      if ((signatureMode === 'draw' || signatureMode === 'pen') && sigCanvas.current) {
         // Small timeout to ensure modal is rendered
         setTimeout(() => {
           const canvas = sigCanvas.current.getCanvas();
@@ -65,7 +67,7 @@ export default function RicevutaGenerator() {
   };
 
   const confirmSignature = () => {
-    if (signatureMode === 'draw') {
+    if (signatureMode === 'draw' || signatureMode === 'pen') {
       if (sigCanvas.current.isEmpty()) {
         setFormData(prev => ({ ...prev, signature: null }));
       } else {
@@ -517,6 +519,17 @@ export default function RicevutaGenerator() {
                     Disegna
                   </button>
                   <button
+                    onClick={() => setSignatureMode('pen')}
+                    className={`flex-1 py-3 text-sm font-medium flex items-center justify-center gap-2 transition-colors ${
+                      signatureMode === 'pen' 
+                        ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50' 
+                        : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    <PenLine size={18} />
+                    Penna
+                  </button>
+                  <button
                     onClick={() => setSignatureMode('type')}
                     className={`flex-1 py-3 text-sm font-medium flex items-center justify-center gap-2 transition-colors ${
                       signatureMode === 'type' 
@@ -530,12 +543,24 @@ export default function RicevutaGenerator() {
                 </div>
 
                 {/* Canvas Area */}
-                <div className="flex-1 bg-white relative cursor-crosshair touch-none overflow-hidden flex flex-col items-center justify-center">
-                  {signatureMode === 'draw' ? (
+                <div 
+                  className={`flex-1 bg-white relative touch-none overflow-hidden flex flex-col items-center justify-center ${
+                    signatureMode === 'pen' ? 'cursor-none' : 'cursor-crosshair'
+                  }`}
+                  onMouseMove={(e) => {
+                    if (signatureMode === 'pen') {
+                      const rect = e.currentTarget.getBoundingClientRect();
+                      setPenPosition({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+                    }
+                  }}
+                  onMouseEnter={() => setIsHoveringCanvas(true)}
+                  onMouseLeave={() => setIsHoveringCanvas(false)}
+                >
+                  {(signatureMode === 'draw' || signatureMode === 'pen') ? (
                     <>
                       <SignatureCanvas 
                         ref={sigCanvas}
-                        penColor="black"
+                        penColor={signatureMode === 'pen' ? 'blue' : 'black'}
                         velocityFilterWeight={0.7}
                         minWidth={1.5}
                         maxWidth={3.5}
@@ -543,6 +568,22 @@ export default function RicevutaGenerator() {
                           className: 'absolute inset-0 w-full h-full'
                         }}
                       />
+                      
+                      {/* Custom Pen Cursor */}
+                      {signatureMode === 'pen' && isHoveringCanvas && (
+                        <div 
+                          className="pointer-events-none absolute z-50 text-blue-600 drop-shadow-lg"
+                          style={{ 
+                            left: penPosition.x, 
+                            top: penPosition.y,
+                            transform: 'translate(0, -100%) rotate(-15deg)',
+                            transformOrigin: 'bottom left'
+                          }}
+                        >
+                          <PenTool size={48} fill="currentColor" strokeWidth={1.5} />
+                        </div>
+                      )}
+
                       <div className="absolute bottom-4 left-0 right-0 text-center pointer-events-none opacity-20">
                         <div className="border-b-2 border-black w-2/3 mx-auto mb-2"></div>
                         <span className="text-xl font-serif italic">Firma qui</span>
@@ -586,7 +627,7 @@ export default function RicevutaGenerator() {
 
                 {/* Modal Footer */}
                 <div className="p-4 border-t border-gray-100 bg-gray-50 flex justify-between items-center gap-4">
-                  {signatureMode === 'draw' && (
+                  {(signatureMode === 'draw' || signatureMode === 'pen') && (
                     <button
                       onClick={clearSignature}
                       className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors font-medium"
