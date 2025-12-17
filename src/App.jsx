@@ -3,27 +3,37 @@ import { Download, FileText, Eraser, PenLine, X, Check, Keyboard, PenTool } from
 import SignatureCanvas from 'react-signature-canvas';
 
 export default function RicevutaGenerator() {
-  const [formData, setFormData] = useState({
-    docNumber: '2025/08/001',
-    docDate: '1 agosto 2025',
-    prestatoreName: 'Alessandro Russo',
-    prestatoreAddress: 'Contrada Cala Creta, 32',
-    prestatoreCity: '92031 Lampedusa (AG)',
-    prestatoreCF: 'RSSLSN91H21G377W',
-    committenteRagione: 'TNS ict travel solutions',
-    committentePIVA: 'IT13134510158',
-    committenteAddress: 'Bastioni di Porta Volta, 10',
-    committenteCity: '20121 Milano (MI) – Italia',
-    committenteSDI: 'RS76RHR',
-    oggetto: 'Consulenza architetturale piattaforma Creator',
-    descrizione: 'Acconto sul compenso pattuito per prestazione di lavoro autonomo occasionale',
-    compensoLordo: '3330.00',
-    luogo: 'Lampedusa',
-    dataFirma: '1 agosto 2025',
-    nomeFirma: 'Alessandro Russo',
-    noRitenuta: false,
-    signature: null
+  const [formData, setFormData] = useState(() => {
+    const saved = localStorage.getItem('receipt_form_data');
+    if (saved) {
+      return JSON.parse(saved);
+    }
+    return {
+      docNumber: '2024/001',
+      docDate: '15 marzo 2024',
+      prestatoreName: 'Mario Rossi',
+      prestatoreAddress: 'Via Roma, 10',
+      prestatoreCity: '00100 Roma (RM)',
+      prestatoreCF: 'RSSMRA80A01H501U',
+      committenteRagione: 'Azienda Esempio S.r.l.',
+      committentePIVA: '12345678901',
+      committenteAddress: 'Corso Italia, 50',
+      committenteCity: '20121 Milano (MI)',
+      committenteSDI: '0000000',
+      oggetto: 'Sviluppo sito web aziendale',
+      descrizione: 'Prestazione occasionale per sviluppo frontend e backend',
+      compensoLordo: '1000.00',
+      luogo: 'Roma',
+      dataFirma: '15 marzo 2024',
+      nomeFirma: 'Mario Rossi',
+      noRitenuta: false,
+      signature: null
+    };
   });
+
+  useEffect(() => {
+    localStorage.setItem('receipt_form_data', JSON.stringify(formData));
+  }, [formData]);
 
   const [userRole, setUserRole] = useState('prestatore'); // 'prestatore' | 'committente'
   const [isSignatureModalOpen, setIsSignatureModalOpen] = useState(false);
@@ -540,7 +550,7 @@ export default function RicevutaGenerator() {
           {/* Signature Modal */}
           {isSignatureModalOpen && (
             <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
-              <div className="bg-white rounded-xl shadow-2xl w-full max-w-3xl flex flex-col h-[80vh] md:h-[600px] overflow-hidden">
+              <div className="bg-white rounded-xl shadow-2xl w-full max-w-3xl flex flex-col h-[60vh] md:h-[450px] overflow-hidden">
                 {/* Modal Header */}
                 <div className="flex justify-between items-center p-4 border-b border-gray-100 bg-gray-50">
                   <div>
@@ -854,15 +864,15 @@ export default function RicevutaGenerator() {
                   <div className="font-semibold text-xs uppercase tracking-wide mb-2">Luogo e Data</div>
                   <div className="font-bold">{formData.luogo}, {formData.dataFirma}</div>
                 </div>
-                <div className="text-center w-5/12">
+                <div className="text-center w-6/12">
                   <div className="font-semibold text-xs uppercase tracking-wide mb-2">Firma del Prestatore</div>
                   <div 
                     onClick={openSignatureModal}
-                    className="border-b-2 border-black h-16 mb-2 flex items-end justify-center cursor-pointer hover:bg-gray-50 transition-colors group relative"
+                    className="border-b-2 border-black h-24 mb-2 flex items-end justify-center cursor-pointer hover:bg-gray-50 transition-colors group relative"
                     title="Clicca per firmare"
                   >
                     {formData.signature ? (
-                      <img src={formData.signature} alt="Firma" className="h-14 object-contain" />
+                      <img src={formData.signature} alt="Firma" className="h-20 object-contain" />
                     ) : (
                       <span className="text-gray-300 text-xs italic pb-2 group-hover:text-blue-600">Clicca per firmare</span>
                     )}
