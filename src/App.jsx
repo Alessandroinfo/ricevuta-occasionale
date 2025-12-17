@@ -219,7 +219,7 @@ export default function RicevutaGenerator() {
       <div className="no-print bg-white border-b border-gray-200 py-4 px-6 shadow-sm">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <img src="./favicon.svg" alt="Logo" className="w-10 h-10" />
+            <img src={`${import.meta.env.BASE_URL}favicon.svg`} alt="Logo" className="w-10 h-10" />
             <h1 className="text-2xl font-bold text-gray-900">Ricevuta Occasionale Online</h1>
           </div>
           <div className="flex gap-3">
