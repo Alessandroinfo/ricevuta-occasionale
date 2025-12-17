@@ -29,12 +29,62 @@ export default function RicevutaGenerator() {
   const [isSignatureModalOpen, setIsSignatureModalOpen] = useState(false);
   const [signatureMode, setSignatureMode] = useState('draw'); // 'draw' | 'type' | 'pen'
   const [typedSignature, setTypedSignature] = useState('');
-  const [penPosition, setPenPosition] = useState({ x: 0, y: 0 });
-  const [isHoveringCanvas, setIsHoveringCanvas] = useState(false);
+  
+  // Refs for pen simulation
+  const penState = useRef({ 
+    x: 0, y: 0,           // Current interpolated position (viewport relative)
+    targetX: 0, targetY: 0, // Target mouse position (viewport relative)
+    isDown: false 
+  });
+  const rafRef = useRef(null);
+  const penCursorRef = useRef(null);
 
   const receiptRef = useRef(null);
   const sigCanvas = useRef({});
   const textCanvasRef = useRef(null);
+
+  // Animation loop for pen simulation
+  useEffect(() => {
+    if (signatureMode === 'pen') {
+      const loop = () => {
+        const state = penState.current;
+        const factor = 0.08; // Low factor for "heavy/slow" feel
+
+        // Interpolate
+        const dx = state.targetX - state.x;
+        const dy = state.targetY - state.y;
+        
+        if (Math.abs(dx) > 0.1 || Math.abs(dy) > 0.1) {
+          state.x += dx * factor;
+          state.y += dy * factor;
+          
+          // Update cursor visual
+          if (penCursorRef.current) {
+            penCursorRef.current.style.transform = `translate(${state.x}px, ${state.y}px) translate(0, -100%) rotate(-15deg)`;
+          }
+
+          // Draw if down
+          if (state.isDown && sigCanvas.current) {
+            const pad = sigCanvas.current.getSignaturePad();
+            // Call internal method with fake event
+            // signature_pad v2.3.2 uses clientX/Y and getBoundingClientRect
+            pad._strokeUpdate({
+              clientX: state.x,
+              clientY: state.y
+            });
+          }
+        }
+
+        rafRef.current = requestAnimationFrame(loop);
+      };
+      
+      rafRef.current = requestAnimationFrame(loop);
+
+      return () => {
+        if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      };
+    }
+  }, [signatureMode]);
 
   // Resize canvas on modal open
   useEffect(() => {
@@ -543,45 +593,78 @@ export default function RicevutaGenerator() {
                 </div>
 
                 {/* Canvas Area */}
-                <div 
-                  className={`flex-1 bg-white relative touch-none overflow-hidden flex flex-col items-center justify-center ${
-                    signatureMode === 'pen' ? 'cursor-none' : 'cursor-crosshair'
-                  }`}
-                  onMouseMove={(e) => {
-                    if (signatureMode === 'pen') {
-                      const rect = e.currentTarget.getBoundingClientRect();
-                      setPenPosition({ x: e.clientX - rect.left, y: e.clientY - rect.top });
-                    }
-                  }}
-                  onMouseEnter={() => setIsHoveringCanvas(true)}
-                  onMouseLeave={() => setIsHoveringCanvas(false)}
-                >
+                <div className="flex-1 bg-white relative overflow-hidden flex flex-col items-center justify-center">
                   {(signatureMode === 'draw' || signatureMode === 'pen') ? (
                     <>
-                      <SignatureCanvas 
-                        ref={sigCanvas}
-                        penColor={signatureMode === 'pen' ? 'blue' : 'black'}
-                        velocityFilterWeight={0.7}
-                        minWidth={1.5}
-                        maxWidth={3.5}
-                        canvasProps={{
-                          className: 'absolute inset-0 w-full h-full'
-                        }}
-                      />
-                      
-                      {/* Custom Pen Cursor */}
-                      {signatureMode === 'pen' && isHoveringCanvas && (
-                        <div 
-                          className="pointer-events-none absolute z-50 text-blue-600 drop-shadow-lg"
-                          style={{ 
-                            left: penPosition.x, 
-                            top: penPosition.y,
-                            transform: 'translate(0, -100%) rotate(-15deg)',
-                            transformOrigin: 'bottom left'
+                      <div className="absolute inset-0 w-full h-full">
+                        <SignatureCanvas 
+                          ref={sigCanvas}
+                          penColor={signatureMode === 'pen' ? 'blue' : 'black'}
+                          velocityFilterWeight={0.7}
+                          minWidth={signatureMode === 'pen' ? 2 : 1.5}
+                          maxWidth={signatureMode === 'pen' ? 4 : 3.5}
+                          canvasProps={{
+                            className: 'absolute inset-0 w-full h-full'
                           }}
-                        >
-                          <PenTool size={48} fill="currentColor" strokeWidth={1.5} />
-                        </div>
+                        />
+                      </div>
+
+                      {/* Overlay for Pen Mode Simulation */}
+                      {signatureMode === 'pen' && (
+                        <>
+                          <div 
+                            className="absolute inset-0 z-10 cursor-none touch-none"
+                            onPointerDown={(e) => {
+                              e.preventDefault();
+                              const state = penState.current;
+                              state.isDown = true;
+                              state.targetX = e.clientX;
+                              state.targetY = e.clientY;
+                              
+                              if (sigCanvas.current) {
+                                const pad = sigCanvas.current.getSignaturePad();
+                                pad._strokeBegin({ clientX: state.x, clientY: state.y });
+                              }
+                            }}
+                            onPointerMove={(e) => {
+                              const state = penState.current;
+                              state.targetX = e.clientX;
+                              state.targetY = e.clientY;
+                            }}
+                            onPointerUp={() => {
+                              const state = penState.current;
+                              state.isDown = false;
+                              if (sigCanvas.current) {
+                                const pad = sigCanvas.current.getSignaturePad();
+                                pad._strokeEnd({ clientX: state.x, clientY: state.y });
+                              }
+                            }}
+                            onPointerLeave={() => {
+                              const state = penState.current;
+                              state.isDown = false;
+                              if (sigCanvas.current) {
+                                const pad = sigCanvas.current.getSignaturePad();
+                                pad._strokeEnd({ clientX: state.x, clientY: state.y });
+                              }
+                            }}
+                            onPointerEnter={(e) => {
+                              const state = penState.current;
+                              state.x = e.clientX;
+                              state.y = e.clientY;
+                              state.targetX = e.clientX;
+                              state.targetY = e.clientY;
+                            }}
+                          />
+                          
+                          {/* Custom Pen Cursor (Fixed to Viewport) */}
+                          <div 
+                            ref={penCursorRef}
+                            className="fixed top-0 left-0 pointer-events-none z-50 text-blue-600 drop-shadow-xl"
+                            style={{ willChange: 'transform' }}
+                          >
+                            <PenTool size={48} fill="currentColor" strokeWidth={1.5} />
+                          </div>
+                        </>
                       )}
 
                       <div className="absolute bottom-4 left-0 right-0 text-center pointer-events-none opacity-20">
