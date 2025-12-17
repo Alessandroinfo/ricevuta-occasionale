@@ -1,47 +1,72 @@
-# Ricevuta Occasionale
+# Ricevuta Occasionale (Italian Receipt Generator)
 
-Applicazione React per la generazione di ricevute fiscali italiane (Prestazione Occasionale).
+A modern React application for generating, signing, and printing "Prestazione Occasionale" receipts (Italian occasional self-employment receipts).
 
-## Comandi Essenziali
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![React](https://img.shields.io/badge/React-19-blue)
+![Vite](https://img.shields.io/badge/Vite-7-purple)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-cyan)
 
-### Installazione Dipendenze
-```bash
-npm install
-```
+## 📋 Overview
 
-### Avvio in Sviluppo
-Per avviare il server di sviluppo locale:
-```bash
-npm run dev
-```
-L'applicazione sarà disponibile all'indirizzo mostrato nel terminale (solitamente http://localhost:5173).
+This tool simplifies the creation of receipts for occasional work in Italy. It automatically calculates the withholding tax (Ritenuta d'Acconto - 20%) and the net amount, providing a clean, printable format.
 
-### Build per Produzione
-Per creare la versione ottimizzata per la produzione:
+## ✨ Features
+
+- **Real-time Preview**: See the receipt update instantly as you edit details.
+- **Automatic Calculations**: Automatically computes Gross Amount, Withholding Tax (20%), and Net Amount.
+- **Digital Signature**:
+  - **Draw**: Sign directly on the screen.
+  - **Type**: Generate a signature from text.
+  - **Pen Mode**: Simulates a realistic pen stroke with smooth interpolation.
+- **Print & PDF**: Uses the browser's native print function (optimized with CSS `@media print`) to save as PDF or print directly.
+- **Responsive Design**: Works on desktop and mobile devices.
+
+## 🛠️ Tech Stack
+
+- **Framework**: [React](https://react.dev/) (v19)
+- **Build Tool**: [Vite](https://vitejs.dev/)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/) (v4)
+- **Icons**: [Lucide React](https://lucide.dev/)
+- **Signature**: [react-signature-canvas](https://github.com/agilgur5/react-signature-canvas)
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js (v18 or higher recommended)
+- npm or yarn
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/Alessandroinfo/ricevuta-occasionale.git
+   cd ricevuta-occasionale
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Start the development server:
+   ```bash
+   npm run dev
+   ```
+
+4. Open your browser at `http://localhost:5173`.
+
+## 📦 Building for Production
+
+To create a production-ready build:
+
 ```bash
 npm run build
 ```
-I file generati si troveranno nella cartella `dist`.
 
-### Anteprima Build
-Per testare localmente la versione di produzione:
-```bash
-npm run preview
-```
+The output will be in the `dist` directory.
 
-## React + Vite
+## 📄 License
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+This project is licensed under the MIT License.
