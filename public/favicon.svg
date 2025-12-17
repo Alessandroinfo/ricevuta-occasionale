@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Paper background -->
+  <path d="M12 4h40v56l-10-4-10 4-10-4-10 4V4z" fill="#f8fafc" stroke="#334155" stroke-width="2"/>
+  <!-- Lines -->
+  <path d="M20 16h24M20 24h24M20 32h16" stroke="#94a3b8" stroke-width="3" stroke-linecap="round"/>
+  <!-- Euro Symbol Circle -->
+  <circle cx="42" cy="44" r="10" fill="#2563eb"/>
+  <text x="42" y="49" font-family="Arial, sans-serif" font-weight="bold" font-size="14" text-anchor="middle" fill="white">€</text>
+</svg>

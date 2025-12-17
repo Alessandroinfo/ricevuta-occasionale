@@ -1,0 +1,10 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&display=swap');
+
+.receipt-container .text-2xl { font-size: 1.2rem; line-height: 1.6rem; }
+.receipt-container .text-xl { font-size: 1rem; line-height: 1.4rem; }
+.receipt-container .text-lg { font-size: 0.9rem; line-height: 1.4rem; }
+.receipt-container .text-base { font-size: 0.8rem; line-height: 1.2rem; }
+.receipt-container .text-sm { font-size: 0.7rem; line-height: 1rem; }
+.receipt-container .text-xs { font-size: 0.6rem; line-height: 0.8rem; }
+
