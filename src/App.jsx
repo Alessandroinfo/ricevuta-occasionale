@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Download, FileText, Eraser, PenLine, X, Check, Keyboard, PenTool } from 'lucide-react';
+import { FileText, Eraser, PenLine, X, Check, Keyboard, PenTool } from 'lucide-react';
 import SignatureCanvas from 'react-signature-canvas';
 
 export default function RicevutaGenerator() {
@@ -27,7 +27,12 @@ export default function RicevutaGenerator() {
       dataFirma: '15 marzo 2024',
       nomeFirma: 'Mario Rossi',
       noRitenuta: false,
-      signature: null
+      signature: null,
+      iban: '',
+      intestatarioConto: '',
+      banca: '',
+      bicSwift: '',
+      causale: ''
     };
   });
 
@@ -229,13 +234,6 @@ export default function RicevutaGenerator() {
             >
               <FileText size={18} />
               Scarica PDF
-            </button>
-            <button
-              onClick={handlePrint}
-              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
-            >
-              <Download size={18} />
-              Esporta
             </button>
           </div>
         </div>
@@ -482,6 +480,67 @@ export default function RicevutaGenerator() {
                     <span className="text-gray-900 font-medium">Importo Netto:</span>
                     <span className="font-bold text-blue-600">{formatCurrency(calculateNetto())}</span>
                   </div>
+                </div>
+              </div>
+
+              {/* Pagamento */}
+              <div className="space-y-4 pb-4 border-b">
+                <h3 className="font-semibold text-gray-700 text-sm uppercase tracking-wide">Coordinate Bancarie</h3>
+                <p className="text-xs text-gray-500">Opzionale — se compilato verrà mostrato in ricevuta</p>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">IBAN</label>
+                  <input
+                    type="text"
+                    name="iban"
+                    value={formData.iban}
+                    onChange={handleChange}
+                    placeholder="IT60 X054 2811 1010 0000 0123 456"
+                    className="form-input w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Intestatario Conto</label>
+                  <input
+                    type="text"
+                    name="intestatarioConto"
+                    value={formData.intestatarioConto}
+                    onChange={handleChange}
+                    placeholder={formData.prestatoreName}
+                    className="form-input w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Banca</label>
+                  <input
+                    type="text"
+                    name="banca"
+                    value={formData.banca}
+                    onChange={handleChange}
+                    placeholder="Es. Intesa Sanpaolo"
+                    className="form-input w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">BIC / SWIFT</label>
+                  <input
+                    type="text"
+                    name="bicSwift"
+                    value={formData.bicSwift}
+                    onChange={handleChange}
+                    placeholder="Es. BCITITMM"
+                    className="form-input w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Causale Bonifico</label>
+                  <input
+                    type="text"
+                    name="causale"
+                    value={formData.causale}
+                    onChange={handleChange}
+                    placeholder={`Pagamento ricevuta n. ${formData.docNumber}`}
+                    className="form-input w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
                 </div>
               </div>
 
@@ -826,6 +885,41 @@ export default function RicevutaGenerator() {
                   </div>
                 </div>
               </div>
+
+              {/* Coordinate Bancarie */}
+              {formData.iban && (
+                <div className="mb-8">
+                  <div className="text-center font-semibold text-sm uppercase tracking-wide py-3 border-b border-black mb-5">
+                    Coordinate Bancarie per il Pagamento
+                  </div>
+                  <div className="bg-gray-50 border border-gray-200 rounded p-4 text-sm space-y-2">
+                    <div className="flex gap-2">
+                      <span className="font-bold text-xs uppercase w-36 shrink-0">IBAN:</span>
+                      <span className="font-mono tracking-wider">{formData.iban}</span>
+                    </div>
+                    <div className="flex gap-2">
+                      <span className="font-bold text-xs uppercase w-36 shrink-0">Intestatario:</span>
+                      <span>{formData.intestatarioConto || formData.prestatoreName}</span>
+                    </div>
+                    {formData.banca && (
+                      <div className="flex gap-2">
+                        <span className="font-bold text-xs uppercase w-36 shrink-0">Banca:</span>
+                        <span>{formData.banca}</span>
+                      </div>
+                    )}
+                    {formData.bicSwift && (
+                      <div className="flex gap-2">
+                        <span className="font-bold text-xs uppercase w-36 shrink-0">BIC / SWIFT:</span>
+                        <span className="font-mono">{formData.bicSwift}</span>
+                      </div>
+                    )}
+                    <div className="flex gap-2 pt-2 border-t border-gray-300">
+                      <span className="font-bold text-xs uppercase w-36 shrink-0">Causale:</span>
+                      <span>{formData.causale || `Pagamento ricevuta n. ${formData.docNumber}`}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Marca da Bollo */}
               {parseFloat(formData.compensoLordo) > 77.47 && (
